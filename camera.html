@@ -13,7 +13,6 @@
 		<button class="captureBack">Capture back</button>
 		<button class="captureFront">Capture front</button>
 		<button class="fullscreen">Full screen</button>
-		<button class="switch">Flashlight</button>
 
 		<video autoplay></video>
 
@@ -38,11 +37,8 @@
 					//todo: check if camera has a torch
 
 					//let there be light!
-					const btn = document.querySelector('.switch');
-					btn.addEventListener('click', function(){
-						track.applyConstraints({
-							advanced: [{torch: true}]
-						});
+					track.applyConstraints({
+						advanced: [{torch: true}]
 					});
 				});
 			}
