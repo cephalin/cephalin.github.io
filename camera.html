@@ -10,64 +10,59 @@
 		<title>Full Screen Cam</title>
 	</head>
 	<body>
-		<button class="captureBack">Capture back</button>
-		<button class="captureFront">Capture front</button>
-		<button class="fullscreen">Full screen</button>
-
 		<video autoplay></video>
 
 		<script>
-			// VIDEO CAPTURE
+//Test browser support
+const SUPPORTS_MEDIA_DEVICES = 'mediaDevices' in navigator;
 
-			const video = document.querySelector("video");
-			video.setAttribute("autoplay", "");
-			video.setAttribute("muted", "");
-			video.setAttribute("playsinline", "");
+if (SUPPORTS_MEDIA_DEVICES) {
+  //Get the environment camera (usually the second one)
+  navigator.mediaDevices.enumerateDevices().then(devices => {
+  
+    const cameras = devices.filter((device) => device.kind === 'videoinput');
 
-			function handleSuccess(stream) {
-				video.srcObject = stream;
+    if (cameras.length === 0) {
+      throw 'No camera found on this device.';
+    }
+    const camera = cameras[cameras.length - 1];
 
-				// Turn on flashlight
-				const track = stream.getVideoTracks()[0];
 
-				//Create image capture object and get camera capabilities
-				const imageCapture = new ImageCapture(track);
-				const photoCapabilities = imageCapture.getPhotoCapabilities().then(() => {
+	const video = document.querySelector("video");
+	video.setAttribute("autoplay", "");
+	video.setAttribute("muted", "");
+	video.setAttribute("playsinline", "");
 
-					//todo: check if camera has a torch
+    // Create stream and get video track
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        deviceId: camera.deviceId,
+        facingMode: 'environment',
+        height: {ideal: 1080},
+        width: {ideal: 1920}
+      }
+    }).then(stream => {
+		video.srcObject = stream;
 
-					//let there be light!
-					track.applyConstraints({
-						advanced: [{torch: true}]
-					});
-				});
-			}
+      const track = stream.getVideoTracks()[0];
 
-			function handleError(error) {
-				console.error("Error: ", error);
-			}
+      //Create image capture object and get camera capabilities
+      const imageCapture = new ImageCapture(track)
+      const photoCapabilities = imageCapture.getPhotoCapabilities().then(() => {
 
-			function capture(elementSelector, facingMode) {
-				const element = document.querySelector(elementSelector);
+        //todo: check if camera has a torch
 
-				const constraints = {
-					video: { facingMode: facingMode },
-				};
+        //let there be light!
+		track.applyConstraints({
+            advanced: [{torch: true}]
+          });
+      });
+    });
+  });
+  
+  //The light will be on as long the track exists 
 
-				element.onclick = function () {
-					navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
-				};
-			}
-
-			capture(".captureFront", "user");
-			capture(".captureBack", "environment");
-
-			// FULLSCREEN HANDLING
-
-			const fullscreenButton = document.querySelector(".fullscreen");
-
-			fullscreenButton.onclick = function () {
-				if (video.webkitEnterFullScreen) {
+  if (video.webkitEnterFullScreen) {
 					video.webkitEnterFullScreen(); // Mobile Safari
 				} else if (video.requestFullscreen) {
 					video.requestFullscreen();
@@ -78,8 +73,8 @@
 					// IE11
 					video.msRequestFullscreen();
 				}
-			};
 
+}
 		</script>
 	</body>
 </html>
