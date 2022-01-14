@@ -2,15 +2,16 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="apple-mobile-web-app-title" content="Full Screen Cam" />
+		<!-- <meta name="apple-mobile-web-app-title" content="Full Screen Cam" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="mobile-web-app-capable" content="yes"> -->
 
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
 		<title>Full Screen Cam</title>
 	</head>
 	<body>
+		<button id="goFS">Fullscreen</button>
 		<video autoplay></video>
 
 		<script>
@@ -61,7 +62,8 @@ if (SUPPORTS_MEDIA_DEVICES) {
     });
   });
   
-  //The light will be on as long the track exists 
+  var goFS = document.getElementById("goFS");
+  goFS.addEventListener("click", function() {
 	if (video.webkitEnterFullScreen) {
 		video.webkitEnterFullScreen(); // Mobile Safari
 	} else if (video.requestFullscreen) {
@@ -73,6 +75,7 @@ if (SUPPORTS_MEDIA_DEVICES) {
 		// IE11
 		video.msRequestFullscreen();
 	}
+  }, false);
 
 }
 		</script>
