@@ -4,6 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="apple-mobile-web-app-title" content="Full Screen Cam" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="mobile-web-app-capable" content="yes">
 
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
@@ -61,18 +62,20 @@ if (SUPPORTS_MEDIA_DEVICES) {
   });
   
   //The light will be on as long the track exists 
-
-  if (video.webkitEnterFullScreen) {
-					video.webkitEnterFullScreen(); // Mobile Safari
-				} else if (video.requestFullscreen) {
-					video.requestFullscreen();
-				} else if (video.webkitRequestFullscreen) {
-					// Regular Safari
-					video.webkitRequestFullscreen();
-				} else if (video.msRequestFullscreen) {
-					// IE11
-					video.msRequestFullscreen();
-				}
+	if (video.webkitEnterFullScreen) {
+		video.webkitEnterFullScreen(); // Mobile Safari
+	} else if (video.requestFullscreen) {
+		video.requestFullscreen();
+	} else if (video.webkitRequestFullscreen) {
+		// Regular Safari
+		video.webkitRequestFullscreen();
+	} else if (video.mozRequestFullScreen) {
+		video.mozRequestFullScreen();
+	}
+	} else if (video.msRequestFullscreen) {
+		// IE11
+		video.msRequestFullscreen();
+	}
 
 }
 		</script>
