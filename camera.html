@@ -2,9 +2,8 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<!-- <meta name="apple-mobile-web-app-title" content="Full Screen Cam" />
+		<meta name="apple-mobile-web-app-title" content="Full Screen Cam" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="mobile-web-app-capable" content="yes"> -->
 
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
@@ -15,68 +14,67 @@
 		<video autoplay></video>
 
 		<script>
+
 //Test browser support
 const SUPPORTS_MEDIA_DEVICES = 'mediaDevices' in navigator;
 
 if (SUPPORTS_MEDIA_DEVICES) {
-  //Get the environment camera (usually the second one)
-  navigator.mediaDevices.enumerateDevices().then(devices => {
+	//Get the environment camera (usually the second one)
+	navigator.mediaDevices.enumerateDevices().then(devices => {
+	
+		const cameras = devices.filter((device) => device.kind === 'videoinput');
+
+		if (cameras.length === 0) {
+		throw 'No camera found on this device.';
+		}
+		const camera = cameras[cameras.length - 1];
+
+
+		const video = document.querySelector("video");
+		video.setAttribute("autoplay", "");
+		video.setAttribute("muted", "");
+		video.setAttribute("playsinline", "");
+
+		// Create stream and get video track
+		navigator.mediaDevices.getUserMedia({
+		video: {
+			facingMode: 'environment'
+		}
+		}).then(stream => {
+			video.srcObject = stream;
+
+			const track = stream.getVideoTracks()[0];
+
+			video.addEventListener('loadedmetadata', (e) => {  
+				window.setTimeout(() => (function() {
+					if (track.getCapabilities().torch) {
+						track.applyConstraints({
+							advanced: [{torch: true}]
+						})
+						.catch(e => console.log(e));
+					}
+
+				}), 500);
+			});
+		});
+
+		var goFS = document.getElementById("goFS");
+		goFS.addEventListener("click", function() {
+			if (video.webkitEnterFullScreen) {
+				video.webkitEnterFullScreen(); // Mobile Safari
+			} else if (video.requestFullscreen) {
+				video.requestFullscreen();
+			} else if (video.webkitRequestFullscreen) {
+				// Regular Safari
+				video.webkitRequestFullscreen();
+			} else if (video.msRequestFullscreen) {
+				// IE11
+				video.msRequestFullscreen();
+			}
+		}, false);
+
+	});
   
-    const cameras = devices.filter((device) => device.kind === 'videoinput');
-
-    if (cameras.length === 0) {
-      throw 'No camera found on this device.';
-    }
-    const camera = cameras[cameras.length - 1];
-
-
-	const video = document.querySelector("video");
-	video.setAttribute("autoplay", "");
-	video.setAttribute("muted", "");
-	video.setAttribute("playsinline", "");
-
-    // Create stream and get video track
-    navigator.mediaDevices.getUserMedia({
-      video: {
-        deviceId: camera.deviceId,
-        facingMode: 'environment',
-        height: {ideal: 1080},
-        width: {ideal: 1920}
-      }
-    }).then(stream => {
-		video.srcObject = stream;
-
-      const track = stream.getVideoTracks()[0];
-
-      //Create image capture object and get camera capabilities
-      const imageCapture = new ImageCapture(track)
-      const photoCapabilities = imageCapture.getPhotoCapabilities().then(() => {
-
-        //todo: check if camera has a torch
-
-        //let there be light!
-		track.applyConstraints({
-            advanced: [{torch: true}]
-          });
-      });
-    });
-  });
-  
-  var goFS = document.getElementById("goFS");
-  goFS.addEventListener("click", function() {
-	if (video.webkitEnterFullScreen) {
-		video.webkitEnterFullScreen(); // Mobile Safari
-	} else if (video.requestFullscreen) {
-		video.requestFullscreen();
-	} else if (video.webkitRequestFullscreen) {
-		// Regular Safari
-		video.webkitRequestFullscreen();
-	} else if (video.msRequestFullscreen) {
-		// IE11
-		video.msRequestFullscreen();
-	}
-  }, false);
-
 }
 		</script>
 	</body>
